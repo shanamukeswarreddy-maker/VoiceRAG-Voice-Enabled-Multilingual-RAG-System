@@ -467,6 +467,36 @@ body {
     color: #111111;
 }
 
+/* ── OR Divider ──────────────────────────────────────────────────── */
+.or-divider {
+    width: min(720px, 92vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 4px 0;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--panel-border);
+}
+
+.divider-text {
+    white-space: nowrap;
+    font-family: var(--font-display);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+}
+
 /* ── Text Composer ──────────────────────────────────────────────── */
 .composer {
     width: min(720px, 92vw);
