@@ -374,6 +374,10 @@
         const query = composerInput.value.trim();
         if (!query || isProcessing) return;
 
+        if (isListening) {
+            stopListening(false);
+        }
+
         composerInput.value = '';
         autoResizeTextarea();
         await processTextQuery(query);
@@ -429,10 +433,15 @@
                 }
             }
 
-            const mapped = mapBackendResponse(rawData);
+            let mapped = mapBackendResponse(rawData);
 
-            // Update user message if transcript returned
-            if (mapped.sttTranscript) {
+            // If STT returned speech recognition error BUT user typed text into fallbackQueryText, fallback to text query
+            if (mapped.mode === 'voice_error' && fallbackQueryText) {
+                console.warn('STT failed, falling back to typed query:', fallbackQueryText);
+                updateUserMessage(turnId, fallbackQueryText);
+                rawData = await askAssistant(fallbackQueryText, 'text');
+                mapped = mapBackendResponse(rawData);
+            } else if (mapped.sttTranscript) {
                 updateUserMessage(turnId, mapped.sttTranscript);
             }
 
