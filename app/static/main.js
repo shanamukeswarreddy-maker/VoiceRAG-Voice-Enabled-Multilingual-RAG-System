@@ -30,6 +30,7 @@
         bindEvents();
         autoResizeTextarea();
         initVideoLoop();
+        renderHistoryDrawer();
     });
 
     // ── Speech Recognition Initialization ─────────────────────────────────────
@@ -132,13 +133,18 @@
         if (newChatBtn) {
             newChatBtn.addEventListener('click', () => {
                 conversationArea.innerHTML = '';
+                composerInput.value = '';
+                autoResizeTextarea();
+                setVoiceState('IDLE');
                 closeDrawer();
+                composerInput.focus();
             });
         }
 
         if (clearHistoryBtn) {
             clearHistoryBtn.addEventListener('click', () => {
                 historyEntries.length = 0;
+                localStorage.removeItem('indicvoice_chat_history_v1');
                 conversationArea.innerHTML = '';
                 renderHistoryDrawer();
                 closeDrawer();
@@ -508,8 +514,27 @@
         };
     }
 
-    // ── Chat History Store ───────────────────────────────────────────────────
-    const historyEntries = [];
+    // ── Chat History Store & Persistence ──────────────────────────────────────
+    const HISTORY_STORAGE_KEY = 'indicvoice_chat_history_v1';
+    let historyEntries = loadHistoryFromStorage();
+
+    function loadHistoryFromStorage() {
+        try {
+            const saved = localStorage.getItem(HISTORY_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.warn('Failed to load history from localStorage:', e);
+            return [];
+        }
+    }
+
+    function saveHistoryToStorage() {
+        try {
+            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyEntries));
+        } catch (e) {
+            console.warn('Failed to save history to localStorage:', e);
+        }
+    }
 
     function addHistoryEntry(turnId, userText, mode) {
         if (!userText || userText.trim() === '' || userText === 'Voice Input') return;
@@ -525,6 +550,7 @@
         } else {
             historyEntries.unshift(entryObj);
         }
+        saveHistoryToStorage();
         renderHistoryDrawer();
     }
 
@@ -549,7 +575,7 @@
             else if (entry.mode === 'refusal') modeBadge = 'REFUSAL';
 
             return `
-                <div class="history-item" data-turn-id="${entry.id}">
+                <div class="history-item" data-turn-id="${entry.id}" data-query-text="${escapeHtml(entry.text)}">
                     <div class="history-item-title">${escapeHtml(entry.text)}</div>
                     <div class="history-item-meta">
                         <span>${modeBadge}</span>
@@ -560,15 +586,20 @@
         }).join('');
 
         historyListEl.querySelectorAll('.history-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', async () => {
                 const turnId = item.getAttribute('data-turn-id');
+                const queryText = item.getAttribute('data-query-text');
                 const targetTurn = document.getElementById(turnId);
+
+                const drawerOverlay = document.getElementById('drawer-overlay');
+                const sidenavDrawer = document.getElementById('sidenav-drawer');
+                if (sidenavDrawer) sidenavDrawer.classList.remove('open');
+                if (drawerOverlay) drawerOverlay.classList.remove('open');
+
                 if (targetTurn) {
                     targetTurn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const drawerOverlay = document.getElementById('drawer-overlay');
-                    const sidenavDrawer = document.getElementById('sidenav-drawer');
-                    if (sidenavDrawer) sidenavDrawer.classList.remove('open');
-                    if (drawerOverlay) drawerOverlay.classList.remove('open');
+                } else if (queryText) {
+                    await processTextQuery(queryText);
                 }
             });
         });
