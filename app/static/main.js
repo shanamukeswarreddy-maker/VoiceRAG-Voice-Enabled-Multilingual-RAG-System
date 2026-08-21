@@ -29,6 +29,7 @@
         initSpeechRecognition();
         bindEvents();
         autoResizeTextarea();
+        initVideoLoop();
     });
 
     // ── Speech Recognition Initialization ─────────────────────────────────────
@@ -210,18 +211,42 @@
         }
     }
 
-    // ── Background Video Switcher ─────────────────────────────────────────────
-    function setActiveVideo(index) {
+    // ── Background Video Sequential Loop ─────────────────────────────────────────
+    let currentVideoIndex = 0;
+
+    function initVideoLoop() {
+        const bgVideos = document.querySelectorAll('.bg-video');
+        bgVideos.forEach((vid, i) => {
+            vid.addEventListener('ended', () => {
+                const nextIndex = (i + 1) % bgVideos.length;
+                playVideoAtIndex(nextIndex);
+            });
+        });
+        playVideoAtIndex(0);
+    }
+
+    function playVideoAtIndex(index) {
+        currentVideoIndex = index;
         const bgVideos = document.querySelectorAll('.bg-video');
         bgVideos.forEach((vid, i) => {
             if (i === index) {
                 vid.classList.add('active', 'opacity-100');
                 vid.classList.remove('opacity-0');
+                try {
+                    vid.currentTime = 0;
+                    vid.play().catch(e => console.warn('Video play error:', e));
+                } catch (e) {
+                    console.warn(e);
+                }
             } else {
                 vid.classList.remove('active', 'opacity-100');
                 vid.classList.add('opacity-0');
             }
         });
+    }
+
+    function setActiveVideo(index) {
+        playVideoAtIndex(index);
     }
 
     // ── Voice State UI Management ──────────────────────────────────────────────
