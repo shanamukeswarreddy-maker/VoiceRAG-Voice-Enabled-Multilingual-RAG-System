@@ -110,6 +110,7 @@ async def health_check():
     )
 
 
+@app.post("/api/v1/query", response_model=PipelineResponse)
 @app.post("/api/query/text", response_model=PipelineResponse)
 async def query_text(request: TextQueryRequest):
     """
@@ -130,6 +131,7 @@ async def query_text(request: TextQueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/v1/query/voice", response_model=PipelineResponse)
 @app.post("/api/query/voice", response_model=PipelineResponse)
 async def query_voice(
     audio: UploadFile = File(...),
@@ -208,6 +210,40 @@ async def serve_frontend():
         {"message": "Voice-Enabled RAG API", "docs": "/docs"},
         status_code=200,
     )
+
+
+@app.get("/{file_name}")
+async def serve_root_files(file_name: str):
+    """Serve root static files like styles.css, main.js, etc."""
+    file_path = static_dir / file_name
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(str(file_path))
+    raise HTTPException(status_code=404, detail="File not found")
+
+
+@app.get("/assets/{asset_path:path}")
+async def serve_assets(asset_path: str):
+    """Serve assets directory."""
+    asset_file = static_dir / "assets" / asset_path
+    if asset_file.exists() and asset_file.is_file():
+        return FileResponse(str(asset_file))
+    # Fallback to root assets folder if exists
+    root_asset = PROJECT_ROOT / "assets" / asset_path
+    if root_asset.exists() and root_asset.is_file():
+        return FileResponse(str(root_asset))
+    raise HTTPException(status_code=404, detail="Asset not found")
+
+
+@app.get("/fonts/{font_path:path}")
+async def serve_fonts(font_path: str):
+    """Serve fonts directory."""
+    font_file = static_dir / "fonts" / font_path
+    if font_file.exists() and font_file.is_file():
+        return FileResponse(str(font_file))
+    root_font = PROJECT_ROOT / "fonts" / font_path
+    if root_font.exists() and root_font.is_file():
+        return FileResponse(str(root_font))
+    raise HTTPException(status_code=404, detail="Font not found")
 
 
 # ── Run with uvicorn ──────────────────────────────────────────────────────
