@@ -330,6 +330,7 @@ body {
     font-size: 16px;
     letter-spacing: 1.5px;
     color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
     margin-top: 4px;
     text-transform: uppercase;
 }
@@ -337,10 +338,17 @@ body {
 .voice-status-label {
     font-family: var(--font-sans);
     font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
+    font-weight: 600;
+    color: #ffffff;
     letter-spacing: 1.2px;
     text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 4px 14px;
+    border-radius: 12px;
 }
 
 /* ── Conversation Area ──────────────────────────────────────────── */
@@ -509,9 +517,9 @@ body {
     justify-content: center;
     gap: 16px;
     margin: 4px 0;
-    color: var(--muted);
+    color: #ffffff;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards;
@@ -520,15 +528,24 @@ body {
 .divider-line {
     flex: 1;
     height: 1px;
-    background: var(--panel-border);
+    background: rgba(255, 255, 255, 0.40);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.60);
 }
 
 .divider-text {
     white-space: nowrap;
     font-family: var(--font-display);
-    color: var(--muted);
+    color: #ffffff;
     font-size: 11px;
+    font-weight: 600;
     letter-spacing: 1.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.90);
+    background: rgba(0, 0, 0, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 4px 12px;
+    border-radius: 10px;
 }
 
 /* ── Text Composer ──────────────────────────────────────────────── */
