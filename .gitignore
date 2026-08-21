@@ -1,0 +1,17 @@
+# .gitignore
+__pycache__/
+*.pyc
+*.pyo
+.env
+data/raw/
+data/chunks/
+data/indices/
+results/
+logs/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+*.faiss

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Voice-Enabled Multilingual RAG System with Sarvam STT, FAISS retrieval, and Groq LLM generation">
+    <title>VoiceRAG — Multilingual Knowledge Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background effects -->
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="logo-text">VoiceRAG</h1>
+                    <p class="logo-subtitle">Multilingual Knowledge Search</p>
+                </div>
+            </div>
+            <div class="header-status" id="header-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Query Section -->
+            <section class="query-section">
+                <div class="query-card glass-card">
+                    <div class="query-controls">
+                        <div class="strategy-selector">
+                            <label for="strategy-select">Chunking Strategy</label>
+                            <select id="strategy-select">
+                                <option value="fixed" selected>Fixed-Size (256 tokens)</option>
+                                <option value="semantic">Semantic (topic-aware)</option>
+                                <option value="sentence_window">Sentence Window</option>
+                                <option value="metadata_aware">Metadata-Aware</option>
+                            </select>
+                        </div>
+                        <div class="topk-selector">
+                            <label for="topk-input">Top-K</label>
+                            <input type="number" id="topk-input" value="2" min="1" max="20">
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <div class="text-input-wrapper">
+                            <input type="text" id="query-input" placeholder="Ask a question in any language..." autocomplete="off">
+                            <button id="send-btn" class="send-btn" title="Send text query">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="divider-text">or</div>
+                        <button id="mic-btn" class="mic-btn" title="Hold to record">
+                            <div class="mic-rings">
+                                <div class="ring ring-1"></div>
+                                <div class="ring ring-2"></div>
+                                <div class="ring ring-3"></div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="22"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="mic-hint" id="mic-hint">Click mic to start recording</p>
+                </div>
+            </section>
+
+            <!-- Response Section -->
+            <section class="response-section" id="response-section" style="display: none;">
+                <!-- Answer Card -->
+                <div class="answer-card glass-card" id="answer-card">
+                    <div class="answer-header">
+                        <h2>Answer</h2>
+                        <span class="language-badge" id="language-badge"></span>
+                    </div>
+                    <div class="answer-text" id="answer-text"></div>
+                </div>
+
+                <!-- Latency Dashboard -->
+                <div class="latency-card glass-card" id="latency-card">
+                    <h3>⚡ Latency Breakdown</h3>
+                    <div class="latency-note">STT latency is measured separately from the &lt;200ms pipeline target</div>
+                    <div class="latency-grid" id="latency-grid"></div>
+                    <div class="latency-total" id="latency-total"></div>
+                </div>
+
+                <!-- Retrieved Passages -->
+                <div class="passages-card glass-card" id="passages-card">
+                    <h3>📄 Retrieved Passages</h3>
+                    <div class="passages-list" id="passages-list"></div>
+                </div>
+
+                <!-- Guardrail Status -->
+                <div class="guardrails-card glass-card" id="guardrails-card">
+                    <h3>🛡️ Guardrail Checks</h3>
+                    <div class="guardrails-list" id="guardrails-list"></div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div class="loading-overlay" id="loading-overlay" style="display: none;">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <span>Processing...</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Built with Sarvam AI STT • FAISS • Groq LLM • MSMARCO-XI Dataset</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

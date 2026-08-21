@@ -1,0 +1,68 @@
+# Voice-Enabled RAG System Configuration
+
+# Dataset settings
+dataset:
+  name: "ai4bharat/MSMARCO-XI"
+  languages: ["hi"]            # Primary language(s) to index
+  max_passages: 100000         # Max passages to index for optimal demo performance
+  validation_sample: 100       # Number of queries for benchmark
+
+# Chunking configuration
+chunking:
+  default_strategy: "fixed"    # fixed | semantic | sentence_window | metadata_aware
+  fixed:
+    chunk_size: 256            # Tokens per chunk
+    overlap_ratio: 0.20        # 20% overlap
+  semantic:
+    similarity_threshold: 0.5  # Split when cosine sim drops below this
+    min_chunk_size: 50         # Minimum tokens per semantic chunk
+    max_chunk_size: 512        # Maximum tokens per semantic chunk
+  sentence_window:
+    anchor_sentences: 2        # Number of sentences in the anchor chunk
+    window_sentences: 2        # Number of surrounding sentences on each side
+  metadata_aware:
+    preserve_fields: ["query_id", "passage_id", "is_selected", "source_lang", "target_lang"]
+
+# Embedding configuration
+embedding:
+  model_name: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+  dimension: 384
+  batch_size: 256
+  cache_size: 2000             # LRU cache entries for query embeddings
+  normalize: true              # L2 normalize for cosine similarity via dot product
+
+# Retrieval configuration
+retrieval:
+  index_type: "IndexFlatIP"    # Inner Product (Cosine similarity for L2 normalized vectors)
+  top_k: 2                     # Return top 2 candidate chunks to retrieve (reduced for latency)
+  score_threshold: 0.3         # Minimum similarity score to include
+
+# Generation configuration
+generation:
+  provider: "groq"
+  model: "groq/compound-mini"
+  max_tokens: 70
+  temperature: 0.1             # Low temperature for factual answers
+  timeout_seconds: 0.10        # 100ms hard budget cutoff for <100ms mean pipeline target
+  system_prompt: |
+    Answer the user question concisely in 1-2 factual sentences based on the context provided. If context is missing, answer directly.
+
+# Guardrail configuration
+guardrails:
+  stt_confidence_threshold: 0.6
+  grounding_overlap_threshold: 0.3
+  off_topic_similarity_threshold: 0.25
+  unsafe_content_enabled: true
+  grounding_check_enabled: true
+  off_topic_check_enabled: true
+
+# Server configuration
+server:
+  host: "0.0.0.0"
+  port: 8000
+  log_level: "info"
+
+# Tracing
+tracing:
+  enabled: true
+  log_file: "logs/requests.jsonl"
