@@ -48,12 +48,60 @@
         </div>
         <div class="video-overlay"></div>
 
+        <!-- Side Navigation Drawer (Sandwich Bar) -->
+        <div class="drawer-overlay" id="drawer-overlay"></div>
+        <aside class="sidenav-drawer" id="sidenav-drawer" aria-label="Side Navigation">
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <img src="assets/logo.webp" alt="Logo" class="drawer-logo" />
+                    <div>
+                        <div class="drawer-title">INDICVOICE</div>
+                        <div class="drawer-sub">VOICE • RAG • AI</div>
+                    </div>
+                </div>
+                <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close Menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="drawer-nav">
+                <a href="#" class="drawer-link active">
+                    <i class="fa-solid fa-microphone"></i>
+                    <span>Voice Assistant</span>
+                </a>
+                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('15 Indic Languages Supported: Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, etc.');">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>Multilingual Settings</span>
+                </a>
+                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('Hybrid RAG System: FAISS Vector Index + BM25 Lexical Search + RRF Reciprocal Rank Fusion + Groq LLM');">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>RAG & Model Info</span>
+                </a>
+                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('Telemetry Active: Pipeline latencies, STT timings, and confidence scores live logging.');">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Telemetry Logs</span>
+                </a>
+                <a href="#" class="drawer-link" onclick="event.preventDefault(); fetch('/api/health').then(r=>r.json()).then(d=>alert('System Diagnostics:\n' + JSON.stringify(d, null, 2)));">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>System Diagnostics</span>
+                </a>
+            </nav>
+
+            <div class="drawer-footer">
+                <div class="drawer-footer-pill">
+                    <span class="online-dot">●</span> SYSTEM READY
+                </div>
+                <div class="drawer-footer-text">IndicVoice v1.0 • Multilingual RAG</div>
+            </div>
+        </aside>
+
         <!-- Header -->
         <header class="topbar">
             <div class="topbar-left">
-                <div class="logo-container">
+                <button class="logo-container drawer-toggle" id="drawer-toggle" aria-label="Toggle Navigation Menu" title="Open Menu">
                     <img src="assets/logo.webp" alt="IndicVoice Logo" class="logo-img" />
-                </div>
+                    <span class="hamburger-badge"><i class="fa-solid fa-bars"></i></span>
+                </button>
             </div>
             
             <div class="topbar-center">

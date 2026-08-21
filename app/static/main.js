@@ -106,6 +106,26 @@
 
         // Input height auto-resize
         composerInput.addEventListener('input', autoResizeTextarea);
+
+        // Side Navigation Drawer (Sandwich Bar)
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerCloseBtn = document.getElementById('drawer-close-btn');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const sidenavDrawer = document.getElementById('sidenav-drawer');
+
+        function openDrawer() {
+            if (sidenavDrawer) sidenavDrawer.classList.add('open');
+            if (drawerOverlay) drawerOverlay.classList.add('open');
+        }
+
+        function closeDrawer() {
+            if (sidenavDrawer) sidenavDrawer.classList.remove('open');
+            if (drawerOverlay) drawerOverlay.classList.remove('open');
+        }
+
+        if (drawerToggle) drawerToggle.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
     }
 
     // ── Voice Toggle Logic ────────────────────────────────────────────────────
