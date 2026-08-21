@@ -1,6 +1,6 @@
 /**
- * INDICVOICE — Voice-Enabled Multilingual RAG Assistant
- * Production-ready Vanilla JavaScript Application
+ * LUMORA — Voice-Enabled Multilingual RAG Assistant
+ * Frontend Application Controller
  */
 
 (function () {

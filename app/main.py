@@ -37,7 +37,7 @@ logger = logging.getLogger("rag.api")
 # ── FastAPI App ───────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="Voice-Enabled RAG System",
+    title="Lumora — Voice-Enabled Multilingual RAG",
     description="Multilingual RAG pipeline with Sarvam STT, FAISS retrieval, and Groq LLM generation",
     version="1.0.0",
 )
