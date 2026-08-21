@@ -48,15 +48,15 @@
         </div>
         <div class="video-overlay"></div>
 
-        <!-- Side Navigation Drawer (Sandwich Bar) -->
+        <!-- Side Navigation Drawer (Chat History) -->
         <div class="drawer-overlay" id="drawer-overlay"></div>
-        <aside class="sidenav-drawer" id="sidenav-drawer" aria-label="Side Navigation">
+        <aside class="sidenav-drawer" id="sidenav-drawer" aria-label="Chat History Navigation">
             <div class="drawer-header">
                 <div class="drawer-brand">
-                    <img src="assets/logo.webp" alt="Logo" class="drawer-logo" />
+                    <i class="fa-solid fa-clock-rotate-left drawer-history-icon"></i>
                     <div>
-                        <div class="drawer-title">INDICVOICE</div>
-                        <div class="drawer-sub">VOICE • RAG • AI</div>
+                        <div class="drawer-title">CHAT HISTORY</div>
+                        <div class="drawer-sub">PREVIOUS CONVERSATIONS</div>
                     </div>
                 </div>
                 <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close Menu">
@@ -64,34 +64,25 @@
                 </button>
             </div>
 
-            <nav class="drawer-nav">
-                <a href="#" class="drawer-link active">
-                    <i class="fa-solid fa-microphone"></i>
-                    <span>Voice Assistant</span>
-                </a>
-                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('15 Indic Languages Supported: Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, etc.');">
-                    <i class="fa-solid fa-globe"></i>
-                    <span>Multilingual Settings</span>
-                </a>
-                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('Hybrid RAG System: FAISS Vector Index + BM25 Lexical Search + RRF Reciprocal Rank Fusion + Groq LLM');">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>RAG & Model Info</span>
-                </a>
-                <a href="#" class="drawer-link" onclick="event.preventDefault(); alert('Telemetry Active: Pipeline latencies, STT timings, and confidence scores live logging.');">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Telemetry Logs</span>
-                </a>
-                <a href="#" class="drawer-link" onclick="event.preventDefault(); fetch('/api/health').then(r=>r.json()).then(d=>alert('System Diagnostics:\n' + JSON.stringify(d, null, 2)));">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>System Diagnostics</span>
-                </a>
-            </nav>
+            <div class="history-actions">
+                <button class="new-chat-btn" id="new-chat-btn">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Conversation</span>
+                </button>
+            </div>
+
+            <div class="drawer-history-list" id="drawer-history-list">
+                <div class="history-empty">
+                    <i class="fa-solid fa-comments"></i>
+                    <p>No past conversations yet.<br />Ask a question or speak to start!</p>
+                </div>
+            </div>
 
             <div class="drawer-footer">
-                <div class="drawer-footer-pill">
-                    <span class="online-dot">●</span> SYSTEM READY
-                </div>
-                <div class="drawer-footer-text">IndicVoice v1.0 • Multilingual RAG</div>
+                <button class="clear-history-btn" id="clear-history-btn">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Clear All History</span>
+                </button>
             </div>
         </aside>
 

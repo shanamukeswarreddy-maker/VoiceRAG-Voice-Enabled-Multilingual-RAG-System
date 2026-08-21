@@ -107,11 +107,13 @@
         // Input height auto-resize
         composerInput.addEventListener('input', autoResizeTextarea);
 
-        // Side Navigation Drawer (Sandwich Bar)
+        // Side Navigation Drawer (Chat History)
         const drawerToggle = document.getElementById('drawer-toggle');
         const drawerCloseBtn = document.getElementById('drawer-close-btn');
         const drawerOverlay = document.getElementById('drawer-overlay');
         const sidenavDrawer = document.getElementById('sidenav-drawer');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
 
         function openDrawer() {
             if (sidenavDrawer) sidenavDrawer.classList.add('open');
@@ -126,6 +128,22 @@
         if (drawerToggle) drawerToggle.addEventListener('click', openDrawer);
         if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
         if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+        if (newChatBtn) {
+            newChatBtn.addEventListener('click', () => {
+                conversationArea.innerHTML = '';
+                closeDrawer();
+            });
+        }
+
+        if (clearHistoryBtn) {
+            clearHistoryBtn.addEventListener('click', () => {
+                historyEntries.length = 0;
+                conversationArea.innerHTML = '';
+                renderHistoryDrawer();
+                closeDrawer();
+            });
+        }
     }
 
     // ── Voice Toggle Logic ────────────────────────────────────────────────────
@@ -481,6 +499,72 @@
         };
     }
 
+    // ── Chat History Store ───────────────────────────────────────────────────
+    const historyEntries = [];
+
+    function addHistoryEntry(turnId, userText, mode) {
+        if (!userText || userText.trim() === '' || userText === 'Voice Input') return;
+        const existingIndex = historyEntries.findIndex(e => e.id === turnId);
+        const entryObj = {
+            id: turnId,
+            text: userText,
+            mode: mode || 'rag',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        if (existingIndex >= 0) {
+            historyEntries[existingIndex] = entryObj;
+        } else {
+            historyEntries.unshift(entryObj);
+        }
+        renderHistoryDrawer();
+    }
+
+    function renderHistoryDrawer() {
+        const historyListEl = document.getElementById('drawer-history-list');
+        if (!historyListEl) return;
+
+        if (historyEntries.length === 0) {
+            historyListEl.innerHTML = `
+                <div class="history-empty">
+                    <i class="fa-solid fa-comments"></i>
+                    <p>No past conversations yet.<br />Ask a question or speak to start!</p>
+                </div>
+            `;
+            return;
+        }
+
+        historyListEl.innerHTML = historyEntries.map(entry => {
+            let modeBadge = 'RAG';
+            if (entry.mode === 'groq') modeBadge = 'GROQ AI';
+            else if (entry.mode === 'voice_error') modeBadge = 'ERROR';
+            else if (entry.mode === 'refusal') modeBadge = 'REFUSAL';
+
+            return `
+                <div class="history-item" data-turn-id="${entry.id}">
+                    <div class="history-item-title">${escapeHtml(entry.text)}</div>
+                    <div class="history-item-meta">
+                        <span>${modeBadge}</span>
+                        <span>${entry.time}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        historyListEl.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const turnId = item.getAttribute('data-turn-id');
+                const targetTurn = document.getElementById(turnId);
+                if (targetTurn) {
+                    targetTurn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const drawerOverlay = document.getElementById('drawer-overlay');
+                    const sidenavDrawer = document.getElementById('sidenav-drawer');
+                    if (sidenavDrawer) sidenavDrawer.classList.remove('open');
+                    if (drawerOverlay) drawerOverlay.classList.remove('open');
+                }
+            });
+        });
+    }
+
     // ── UI Rendering Helpers ──────────────────────────────────────────────────
     function appendUserMessage(text) {
         const turnId = 'turn-' + Date.now();
@@ -498,6 +582,7 @@
 
         conversationArea.appendChild(turnEl);
         scrollToBottom();
+        addHistoryEntry(turnId, text, 'rag');
         return turnId;
     }
 
@@ -507,6 +592,7 @@
             const userTextEl = turnEl.querySelector('.user-text');
             if (userTextEl) {
                 userTextEl.textContent = newText;
+                addHistoryEntry(turnId, newText, 'rag');
             }
         }
     }
@@ -514,6 +600,11 @@
     function renderAssistantResponse(turnId, mapped) {
         const turnEl = document.getElementById(turnId);
         if (!turnEl) return;
+
+        const userTextEl = turnEl.querySelector('.user-text');
+        if (userTextEl) {
+            addHistoryEntry(turnId, userTextEl.textContent, mapped.mode);
+        }
 
         const placeholder = turnEl.querySelector('.assistant-placeholder');
         if (!placeholder) return;

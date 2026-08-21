@@ -323,27 +323,138 @@ body {
 }
 
 .drawer-footer {
-    padding-top: 20px;
+    padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.drawer-footer-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 600;
+/* ── Chat History Side Navigation Drawer ─────────────────────────── */
+.drawer-history-icon {
+    font-size: 20px;
     color: #ffffff;
-    letter-spacing: 1px;
 }
 
-.drawer-footer-text {
-    font-size: 11px;
+.history-actions {
+    margin: 16px 0 12px 0;
+}
+
+.new-chat-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.new-chat-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.drawer-history-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+    padding-right: 4px;
+}
+
+.drawer-history-list::-webkit-scrollbar {
+    width: 4px;
+}
+.drawer-history-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
     color: var(--muted);
-    letter-spacing: 0.8px;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 20px;
+}
+
+.history-empty i {
+    font-size: 32px;
+    opacity: 0.5;
+}
+
+.history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateX(3px);
+}
+
+.history-item-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.clear-history-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.60);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.clear-history-btn:hover {
+    background: rgba(255, 60, 60, 0.20);
+    border-color: rgba(255, 60, 60, 0.40);
+    color: #ff6b6b;
 }
 
 .logo-img {
