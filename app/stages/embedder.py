@@ -11,18 +11,25 @@ import logging
 import os
 import time
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import List, Optional
 
-# Pin thread counts BEFORE PyTorch/MKL initialise their pools
-os.environ.setdefault("OMP_NUM_THREADS", "2")
-os.environ.setdefault("MKL_NUM_THREADS", "2")
+# Disable Rust tokenizers sub-thread pool to prevent deadlock with PyTorch/Uvicorn on Windows CPU
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+# Pin single-thread counts BEFORE PyTorch/MKL/OpenBLAS initialize their pools
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 import numpy as np
 import torch
 
-# Lock PyTorch threadpools globally at import time
-torch.set_num_threads(2)
+# Lock PyTorch threadpools globally to single-thread at import time
+torch.set_num_threads(1)
 try:
     torch.set_num_interop_threads(1)
 except RuntimeError:
@@ -33,6 +40,9 @@ from cachetools import LRUCache
 from app.config import get_config
 
 logger = logging.getLogger("rag.embedder")
+
+# Dedicated single-thread pool executor for embedding inference to eliminate thread pool lock contention
+_embedder_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="embedder_worker")
 
 
 class EmbeddingModel:
@@ -135,9 +145,9 @@ class EmbeddingModel:
 
 
     async def aembed_query(self, text: str) -> np.ndarray:
-        """Async wrapper that runs encode_query in a thread executor to avoid blocking the event loop."""
+        """Async wrapper that runs encode_query in dedicated executor to eliminate thread contention."""
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, partial(self.encode_query, text))
+        return await loop.run_in_executor(_embedder_executor, partial(self.encode_query, text))
 
     def encode_batch(self, texts: List[str], show_progress: bool = True) -> np.ndarray:
         """
