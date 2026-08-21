@@ -210,6 +210,20 @@
         }
     }
 
+    // ── Background Video Switcher ─────────────────────────────────────────────
+    function setActiveVideo(index) {
+        const bgVideos = document.querySelectorAll('.bg-video');
+        bgVideos.forEach((vid, i) => {
+            if (i === index) {
+                vid.classList.add('active', 'opacity-100');
+                vid.classList.remove('opacity-0');
+            } else {
+                vid.classList.remove('active', 'opacity-100');
+                vid.classList.add('opacity-0');
+            }
+        });
+    }
+
     // ── Voice State UI Management ──────────────────────────────────────────────
     function setVoiceState(state, customLabel = null) {
         switch (state) {
@@ -218,6 +232,7 @@
                 micWrapper.classList.remove('listening');
                 voiceActionTitle.textContent = 'TAP TO SPEAK';
                 voiceStatusLabel.textContent = customLabel || 'READY TO LISTEN';
+                setActiveVideo(0);
                 break;
 
             case 'LISTENING':
@@ -225,6 +240,7 @@
                 micWrapper.classList.add('listening');
                 voiceActionTitle.textContent = 'TAP TO STOP';
                 voiceStatusLabel.textContent = customLabel || 'LISTENING…';
+                setActiveVideo(1);
                 break;
 
             case 'PROCESSING':
@@ -232,6 +248,7 @@
                 micWrapper.classList.remove('listening');
                 voiceActionTitle.textContent = 'PROCESSING';
                 voiceStatusLabel.textContent = customLabel || 'RETRIEVING KNOWLEDGE…';
+                setActiveVideo(2);
                 break;
 
             case 'ANSWERED':
@@ -239,6 +256,7 @@
                 micWrapper.classList.remove('listening');
                 voiceActionTitle.textContent = 'TAP TO SPEAK';
                 voiceStatusLabel.textContent = customLabel || 'ANSWER READY';
+                setActiveVideo(3);
                 break;
 
             case 'ERROR':
@@ -246,6 +264,7 @@
                 micWrapper.classList.remove('listening');
                 voiceActionTitle.textContent = 'TAP TO SPEAK';
                 voiceStatusLabel.textContent = customLabel || 'TRY AGAIN';
+                setActiveVideo(0);
                 break;
         }
     }

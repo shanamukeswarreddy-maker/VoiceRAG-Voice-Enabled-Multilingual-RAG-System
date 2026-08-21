@@ -23,13 +23,21 @@
 </head>
 <body>
     <div class="app">
-        <!-- Full-screen background video -->
-        <video class="bg-video" autoplay muted loop playsinline>
-            <source
-                src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4"
-                type="video/mp4"
-            />
-        </video>
+        <!-- Background Video Layer (4 Stacked Videos) -->
+        <div class="bg-video-container">
+            <video class="bg-video opacity-100 active" id="bg-video-0" autoplay muted loop playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4" type="video/mp4" />
+            </video>
+            <video class="bg-video opacity-0" id="bg-video-1" autoplay muted loop playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_092026_dd05b805-ea0f-40b2-8c52-332b88502592.mp4" type="video/mp4" />
+            </video>
+            <video class="bg-video opacity-0" id="bg-video-2" autoplay muted loop playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081042_df7202bf-bd80-4b2b-bbc6-1f09ba2870e9.mp4" type="video/mp4" />
+            </video>
+            <video class="bg-video opacity-0" id="bg-video-3" autoplay muted loop playsinline>
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_080959_4cac5234-3573-464e-a5b7-76b94b8a7d61.mp4" type="video/mp4" />
+            </video>
+        </div>
         <div class="video-overlay"></div>
 
         <!-- Header -->
