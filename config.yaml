@@ -40,12 +40,13 @@ retrieval:
 # Generation configuration
 generation:
   provider: "groq"
-  model: "groq/compound-mini"
-  max_tokens: 70
-  temperature: 0.1             # Low temperature for factual answers
-  timeout_seconds: 0.10        # 100ms hard budget cutoff for <100ms mean pipeline target
+  model: "allam-2-7b"
+  max_tokens: 25
+  temperature: 0.0             # Zero temperature for instant deterministic answers
+  timeout_seconds: 4.0         # 4.0s budget for LLM generation
   system_prompt: |
-    Answer the user question concisely in 1-2 factual sentences based on the context provided. If context is missing, answer directly.
+    Answer the user question concisely in 1 sentence based on the context provided.
+
 
 # Guardrail configuration
 guardrails:

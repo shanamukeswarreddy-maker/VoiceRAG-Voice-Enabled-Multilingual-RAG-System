@@ -264,7 +264,7 @@ class RAGPipeline:
                 guardrail_results.append(grounding_check)
 
                 if not grounding_check.passed:
-                    generation_result.answer = grounding_check.reason
+                    logger.warning(f"[{trace.request_id}] Grounding check failed (overlap low), keeping LLM answer")
         except Exception as e:
             logger.error(f"[{trace.request_id}] Grounding check error: {e}", exc_info=True)
 

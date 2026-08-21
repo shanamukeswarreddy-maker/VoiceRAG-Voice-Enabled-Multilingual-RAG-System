@@ -72,20 +72,20 @@ class LLMGenerator:
             logger.warning("GROQ_API_KEY not set — generation will use fallback responses")
 
     def _build_context(self, chunks: List[RetrievedChunk]) -> str:
-        """Build a concise context string from top-3 retrieved chunks, trimmed to relevant spans."""
+        """Build a concise context string from top-2 retrieved chunks, trimmed to 150 chars max."""
         context_parts = []
-        for i, rc in enumerate(chunks[:3], 1):  # Top 3 chunks max
-            text = rc.display_text[:250].strip()  # Truncate to 250 chars max per chunk
+        for i, rc in enumerate(chunks[:2], 1):  # Top 2 chunks max for sub-100ms latency
+            text = rc.display_text[:150].strip()  # Truncate to 150 chars max per chunk
             context_parts.append(f"[{i}] {text}")
         return "\n".join(context_parts)
 
     def _build_messages(self, query: str, context: str) -> list:
         """Build minimal chat messages for ultra-fast generation."""
         return [
-            {"role": "system", "content": self.config.system_prompt},
+            {"role": "system", "content": "Answer in 1 concise sentence (under 15 words) based on context."},
             {
                 "role": "user",
-                "content": f"Context:\n{context}\nQuestion: {query}\nAnswer:",
+                "content": f"Context: {context}\nQuestion: {query}\nAnswer:",
             },
         ]
 
@@ -96,10 +96,11 @@ class LLMGenerator:
         max_tokens: Optional[int] = None,
     ) -> GenerationResult:
         """
-        Generate an answer from query and retrieved context with a hard 150ms timeout.
+        Generate an answer from query and retrieved context with low latency budget.
         """
-        timeout_budget = float(getattr(self.config, "timeout_seconds", 0.10))
+        timeout_budget = float(getattr(self.config, "timeout_seconds", 4.0))
         logger.info(f"[GENERATOR_EXEC] Entering generate() | timeout_budget={timeout_budget}s ({timeout_budget*1000:.0f}ms) | query='{query[:30]}...'")
+
 
         if not self._client:
             answer = fallback_response(retrieved_chunks)

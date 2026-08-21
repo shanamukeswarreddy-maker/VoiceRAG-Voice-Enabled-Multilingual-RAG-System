@@ -5,14 +5,29 @@ Uses paraphrase-multilingual-MiniLM-L6-v2 for fast Indic-language embeddings.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
+import os
 import time
 import unicodedata
+from functools import partial
 from typing import List, Optional
+
+# Pin thread counts BEFORE PyTorch/MKL initialise their pools
+os.environ.setdefault("OMP_NUM_THREADS", "2")
+os.environ.setdefault("MKL_NUM_THREADS", "2")
 
 import numpy as np
 import torch
+
+# Lock PyTorch threadpools globally at import time
+torch.set_num_threads(2)
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass  # already set
+
 from cachetools import LRUCache
 
 from app.config import get_config
@@ -54,21 +69,23 @@ class EmbeddingModel:
         device = getattr(self._model, "device", torch.device("cpu"))
         logger.info(f"Embedding model loaded on device: {device} at timestamp {self._load_timestamp:.2f}")
 
-        # Note/TODO on ONNX Runtime optimization:
-        # Currently using PyTorch with torch.inference_mode().
-        # ONNX Runtime export for paraphrase-multilingual-MiniLM-L6-v2 can be added if lower single-digit latency is required.
-        logger.info("ONNX Runtime check: Using PyTorch inference_mode for multilingual MiniLM-L6-v2")
-
         # Pre-warm PyTorch model with multilingual sample queries of varying lengths
         warmup_queries = [
             "warmup",
             "boren scholarship essay examples",
             "why are earthquakes caused",
+            "what bills has donald trump signed into law",
+            "what does laches mean in legal terms",
             "भारत की राजधानी क्या है",
             "what is the definition of artificial intelligence and machine learning",
         ]
         with torch.inference_mode():
-            _ = self._model.encode(warmup_queries, normalize_embeddings=self.config.normalize)
+            _ = self._model.encode(
+                warmup_queries,
+                normalize_embeddings=self.config.normalize,
+                convert_to_numpy=True,
+                show_progress_bar=False,
+            )
 
         elapsed = (time.perf_counter() - start) * 1000
         logger.info(f"Embedding model loaded and warmed in {elapsed:.0f}ms")
@@ -108,6 +125,7 @@ class EmbeddingModel:
             embedding = self._model.encode(
                 [text],
                 normalize_embeddings=self.config.normalize,
+                convert_to_numpy=True,
                 show_progress_bar=False,
             )[0]
 
@@ -115,9 +133,11 @@ class EmbeddingModel:
         self._cache[key] = embedding
         return embedding
 
+
     async def aembed_query(self, text: str) -> np.ndarray:
-        """Async wrapper for encode_query."""
-        return self.encode_query(text)
+        """Async wrapper that runs encode_query in a thread executor to avoid blocking the event loop."""
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, partial(self.encode_query, text))
 
     def encode_batch(self, texts: List[str], show_progress: bool = True) -> np.ndarray:
         """
