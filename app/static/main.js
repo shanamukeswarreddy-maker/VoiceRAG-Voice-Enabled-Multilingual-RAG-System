@@ -390,7 +390,9 @@
         const fallback = data.fallback_triggered || (data.generation_result && data.generation_result.fallback_triggered);
 
         let mode = 'rag';
-        if (status === 'filtered' || answer.includes('INSUFFICIENT EVIDENCE') || answer.includes('Off-topic') || answer.includes('unsafe')) {
+        if (answer.toLowerCase().includes('speech recognition failed') || answer.toLowerCase().includes('voice input error')) {
+            mode = 'voice_error';
+        } else if (status === 'filtered' || answer.includes('INSUFFICIENT EVIDENCE') || answer.includes('Off-topic') || answer.includes('unsafe')) {
             mode = 'refusal';
         } else if (fallback || !data.retrieval_result || !data.retrieval_result.chunks || data.retrieval_result.chunks.length === 0) {
             mode = 'groq';
@@ -456,7 +458,10 @@
         let badgeHtml = '';
         let latencyLabel = '';
 
-        if (mapped.mode === 'rag') {
+        if (mapped.mode === 'voice_error') {
+            badgeHtml = `<span class="badge badge-refusal"><i class="fa-solid fa-triangle-exclamation"></i> VOICE INPUT ERROR</span>`;
+            latencyLabel = mapped.latencies.stt > 0 ? `STT: ${Math.round(mapped.latencies.stt)} ms` : '';
+        } else if (mapped.mode === 'rag') {
             badgeHtml = `<span class="badge badge-rag"><i class="fa-solid fa-circle-check"></i> GROUNDED RAG</span>`;
             latencyLabel = `RAG LATENCY: ${Math.round(mapped.latencies.pipeline)} ms`;
         } else if (mapped.mode === 'groq') {
