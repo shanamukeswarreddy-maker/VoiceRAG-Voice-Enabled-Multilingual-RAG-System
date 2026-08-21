@@ -89,8 +89,8 @@
     // ── Bind Event Listeners ──────────────────────────────────────────────────
     function bindEvents() {
         // Mic hero button toggle
-        micHeroBtn.addEventListener('click', toggleVoiceInteraction);
-        composerMicBtn.addEventListener('click', toggleVoiceInteraction);
+        if (micHeroBtn) micHeroBtn.addEventListener('click', toggleVoiceInteraction);
+        if (composerMicBtn) composerMicBtn.addEventListener('click', toggleVoiceInteraction);
 
         // Send text query
         sendBtn.addEventListener('click', handleTextSubmit);
