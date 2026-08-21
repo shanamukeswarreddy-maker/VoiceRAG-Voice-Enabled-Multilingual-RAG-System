@@ -44,9 +44,10 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -54,7 +55,7 @@ body {
 
 /* ── Fullscreen Background Video & Overlay ──────────────────────── */
 .bg-video {
-    position: absolute;
+    position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -64,7 +65,7 @@ body {
 }
 
 .video-overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.18);
     pointer-events: none;
@@ -75,14 +76,14 @@ body {
 .app {
     position: relative;
     width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     z-index: 2;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 /* ── Topbar / Header ────────────────────────────────────────────── */
@@ -172,13 +173,12 @@ body {
     flex-direction: column;
     align-items: center;
     flex: 1;
-    justify-content: center;
-    padding: 8px 16px;
+    justify-content: flex-start;
+    padding: 8px 16px 24px 16px;
     gap: 16px;
     position: relative;
     z-index: 5;
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 /* ── Voice Hero Section ─────────────────────────────────────────── */
@@ -297,24 +297,9 @@ body {
 /* ── Conversation Area ──────────────────────────────────────────── */
 .conversation {
     width: min(720px, 92vw);
-    max-height: clamp(180px, 28vh, 300px);
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-right: 4px;
-    scroll-behavior: smooth;
-}
-
-.conversation::-webkit-scrollbar {
-    width: 4px;
-}
-.conversation::-webkit-scrollbar-track {
-    background: transparent;
-}
-.conversation::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
 }
 
 .turn {
